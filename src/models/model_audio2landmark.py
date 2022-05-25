@@ -1,11 +1,11 @@
 """
  # Copyright 2020 Adobe
  # All Rights Reserved.
- 
+
  # NOTICE: Adobe permits you to use, modify, and distribute this file in
  # accordance with the terms of the Adobe license agreement accompanying
  # it.
- 
+
 """
 
 import torch
@@ -242,7 +242,7 @@ class DecoderLayer(nn.Module):
 
         self.attn_1 = MultiHeadAttention(heads, d_model)
         self.attn_2 = MultiHeadAttention(heads, d_model)
-        self.ff = FeedForward(d_model).cuda()
+        self.ff = FeedForward(d_model)
 
     def forward(self, x, e_outputs, src_mask, trg_mask):
         x2 = self.norm_1(x)

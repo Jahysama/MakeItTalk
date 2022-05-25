@@ -1,11 +1,11 @@
 """
  # Copyright 2020 Adobe
  # All Rights Reserved.
- 
+
  # NOTICE: Adobe permits you to use, modify, and distribute this file in
  # accordance with the terms of the Adobe license agreement accompanying
  # it.
- 
+
 """
 
 import sys
@@ -68,7 +68,7 @@ opt_parser = parser.parse_args()
 
 ''' STEP 1: preprocess input single image '''
 img =cv2.imread('examples/' + opt_parser.jpg)
-predictor = face_alignment.FaceAlignment(face_alignment.LandmarksType._3D, device='cuda', flip_input=True)
+predictor = face_alignment.FaceAlignment(face_alignment.LandmarksType._3D, device='cpu', flip_input=True)
 shapes = predictor.get_landmarks(img)
 if (not shapes or len(shapes) != 1):
     print('Cannot detect face landmarks. Exit.')

@@ -1,11 +1,11 @@
 """
  # Copyright 2020 Adobe
  # All Rights Reserved.
- 
+
  # NOTICE: Adobe permits you to use, modify, and distribute this file in
  # accordance with the terms of the Adobe license agreement accompanying
  # it.
- 
+
 """
 
 import os
@@ -55,7 +55,7 @@ class Audio2landmark_model():
         print('G: Running on {}, total num params = {:.2f}M'.format(device, get_n_params(self.G)/1.0e6))
 
         model_dict = self.G.state_dict()
-        ckpt = torch.load(opt_parser.load_a2l_G_name)
+        ckpt = torch.load(opt_parser.load_a2l_G_name, map_location=torch.device('cpu'))
         pretrained_dict = {k: v for k, v in ckpt['G'].items() if k.split('.')[0] not in ['comb_mlp']}
         model_dict.update(pretrained_dict)
         self.G.load_state_dict(model_dict)
@@ -68,7 +68,7 @@ class Audio2landmark_model():
                                       in_size=80, use_prior_net=True,
                                       bidirectional=False, drop_out=0.5)
 
-        ckpt = torch.load(opt_parser.load_a2l_C_name)
+        ckpt = torch.load(opt_parser.load_a2l_C_name, map_location=torch.device('cpu'))
         self.C.load_state_dict(ckpt['model_g_face_id'])
         # self.C.load_state_dict(ckpt['C'])
         print('======== LOAD PRETRAINED FACE ID MODEL {} ========='.format(opt_parser.load_a2l_C_name))
@@ -289,7 +289,3 @@ class Audio2landmark_model():
                                                           + fl_dis_pred_pos_numpy[p, 49 * 3+1:54 * 3+1:3] \
                                                           - fl_dis_pred_pos_numpy[p, 60 * 3+1:65 * 3+1:3]
         return fl_dis_pred_pos_numpy
-
-
-
-

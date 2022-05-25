@@ -152,12 +152,12 @@ def feature_based_pdm_corr(lms_init, models_dir, train_type='basic', patches=Non
         part_inds = part_inds_opt[i]
         pc = pc_opt[i]
         temp_model = os.path.join(models_dir, train_type + '_' + part + '_' + str(pc))
-        filehandler = open(temp_model, "rb")
-        try:
-            pdm_temp = pickle.load(filehandler)
-        except UnicodeDecodeError:
-            pdm_temp = pickle.load(filehandler, fix_imports=True, encoding="latin1")
-        filehandler.close()
+        with open(temp_model, "rb") as filehandler:
+            print(temp_model)
+            try:
+                pdm_temp = pickle.load(filehandler)
+            except:
+                pdm_temp = pickle.load(filehandler, fix_imports=True, encoding="bytes")
 
         if patches is None:
             part_lms_pdm = pdm_correct(lms_init[part_inds], pdm_temp)

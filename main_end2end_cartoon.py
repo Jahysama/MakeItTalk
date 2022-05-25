@@ -1,11 +1,11 @@
 """
  # Copyright 2020 Adobe
  # All Rights Reserved.
- 
+
  # NOTICE: Adobe permits you to use, modify, and distribute this file in
  # accordance with the terms of the Adobe license agreement accompanying
  # it.
- 
+
 """
 
 import sys
@@ -16,6 +16,7 @@ import argparse
 import pickle
 from src.autovc.AutoVC_mel_Convertor_retrain_version import AutoVC_mel_Convertor
 import shutil
+import util.utils as util
 
 ADD_NAIVE_EYE = False
 GEN_AUDIO = True
@@ -78,7 +79,7 @@ ains = [item for item in ains if item is not 'tmp.wav']
 ains.sort()
 for ain in ains:
     os.system('ffmpeg -y -loglevel error -i examples/{} -ar 16000 examples/tmp.wav'.format(ain))
-    shutil.copyfile('examples/tmp.wav', 'examples/{}'.format(ain))
+    #shutil.copyfile('examples/tmp.wav', 'examples/{}'.format(ain))
 
     # au embedding
     from thirdparty.resemblyer_util.speaker_emb import get_spk_emb
@@ -135,7 +136,7 @@ print('finish gen fls')
 fls_names = glob.glob1('examples_cartoon', 'pred_fls_*.txt')
 fls_names.sort()
 
-for i in range(0,len(fls_names)):
+for i in range(0,len(fls_names)-1):
     ains = glob.glob1('examples', '*.wav')
     ains.sort()
     ain = ains[i]
@@ -155,7 +156,7 @@ for i in range(0,len(fls_names)):
     fls[:, :, 0:2] = -fls[:, :, 0:2]
     fls[:, :, 0:2] = (fls[:, :, 0:2] / scale)
     fls[:, :, 0:2] -= shift.reshape(1, 2)
-
+    #fls = util.add_naive_eye(fls)
     fls = fls.reshape(-1, 204)
 
     # additional smooth
@@ -198,15 +199,15 @@ for i in range(0,len(fls_names)):
     # ==============================================
     warp_exe = os.path.join(os.getcwd(), 'facewarp', 'facewarp.exe')
     import os
-    
+
     if (os.path.exists(os.path.join(output_dir, 'output'))):
         shutil.rmtree(os.path.join(output_dir, 'output'))
     os.mkdir(os.path.join(output_dir, 'output'))
     os.chdir('{}'.format(os.path.join(output_dir, 'output')))
     cur_dir = os.getcwd()
     print(cur_dir)
-    
-    if(os.name == 'nt'): 
+
+    if(os.name == 'nt'):
         ''' windows '''
         os.system('{} {} {} {} {} {}'.format(
             warp_exe,

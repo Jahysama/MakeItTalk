@@ -4,14 +4,13 @@ from facewarp.gen_puppet_utils import *
 ''' ================================================
             FOA face landmark detection 
 ================================================ '''
-
 data_dir = out_dir = 'examples_cartoon'
 test_data = sys.argv[1] # for example 'roy_example.png'
 CH = test_data[:-4]
 use_gt_bb = False
 
 if(not os.path.exists(os.path.join(data_dir, CH + '.pts'))):
-
+    import menpo
     from thirdparty.face_of_art.menpo_functions import *
     from thirdparty.face_of_art.deep_heatmaps_model_fusion_net import DeepHeatmapsModel
 
@@ -195,4 +194,3 @@ Press any key to continue.
 
 
 delauney_tri(data_dir, test_data, INNER_ONLY=False)
-

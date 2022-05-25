@@ -131,9 +131,10 @@ def draw_delaunay(img, subdiv, delaunay_color):
 
     for t in triangleList:
 
-        pt1 = (t[0], t[1])
-        pt2 = (t[2], t[3])
-        pt3 = (t[4], t[5])
+        pt1 = t[0], t[1]
+        pt2 = t[2], t[3]
+        pt3 = t[4], t[5]
+        print(pt1)
 
         if rect_contains(r, pt1) and rect_contains(r, pt2) and rect_contains(r, pt3):
             cv2.line(img, pt1, pt2, delaunay_color, 1, cv2.LINE_AA, 0)
@@ -277,11 +278,3 @@ def delauney_tri(ROOT_DIR, test_data, INNER_ONLY=False):
 
     a = np.array(new_tri).astype(int)
     np.savetxt(os.path.join(ROOT_DIR, CH + '_delauney_tri.txt'), a, fmt='%d')
-
-
-
-
-
-
-
-
