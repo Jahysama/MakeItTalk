@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/facewarp.dir/facewarp.cpp.o  -o ../bin/facewarp  ../third_party/glfw/src/libglfw3.a /usr/lib/x86_64-linux-gnu/libGL.so -lpthread /usr/lib/x86_64-linux-gnu/librt.so -lm -ldl 
