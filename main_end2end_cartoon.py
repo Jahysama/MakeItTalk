@@ -136,7 +136,7 @@ print('finish gen fls')
 fls_names = glob.glob1('examples_cartoon', 'pred_fls_*.txt')
 fls_names.sort()
 
-for i in range(0,len(fls_names)-1):
+for i in range(0,len(fls_names)):
     ains = glob.glob1('examples', '*.wav')
     ains.sort()
     ain = ains[i]
