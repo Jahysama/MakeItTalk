@@ -197,7 +197,7 @@ for i in range(0,len(fls_names)):
     # ==============================================
     # Step 4 : Vector art morphing
     # ==============================================
-    warp_exe = os.path.join(os.getcwd(), 'facewarp', 'facewarp.exe')
+    warp_exe = os.path.join(os.getcwd(), 'facewarp', 'facewarp')
     import os
 
     if (os.path.exists(os.path.join(output_dir, 'output'))):
@@ -205,9 +205,9 @@ for i in range(0,len(fls_names)):
     os.mkdir(os.path.join(output_dir, 'output'))
     os.chdir('{}'.format(os.path.join(output_dir, 'output')))
     cur_dir = os.getcwd()
-    print(cur_dir)
+    print(f'Current dir: {cur_dir}')
 
-    os.system('wine {} {} {} {} {} {}'.format(
+    os.system('{} {} {} {} {} {}'.format(
             warp_exe,
             os.path.join(cur_dir, '..', '..', opt_parser.jpg),
             os.path.join(cur_dir, '..', 'triangulation.txt'),
