@@ -1,8 +1,0 @@
-/home/kosar/Desktop/MakeItTalk/facewarp/facewarp/third_party/CMakeFiles/rebuild_cache.dir
-/home/kosar/Desktop/MakeItTalk/facewarp/facewarp/third_party/CMakeFiles/edit_cache.dir
-/home/kosar/Desktop/MakeItTalk/facewarp/facewarp/third_party/glfw/CMakeFiles/rebuild_cache.dir
-/home/kosar/Desktop/MakeItTalk/facewarp/facewarp/third_party/glfw/CMakeFiles/edit_cache.dir
-/home/kosar/Desktop/MakeItTalk/facewarp/facewarp/third_party/glfw/src/CMakeFiles/rebuild_cache.dir
-/home/kosar/Desktop/MakeItTalk/facewarp/facewarp/third_party/glfw/src/CMakeFiles/edit_cache.dir
-/home/kosar/Desktop/MakeItTalk/facewarp/facewarp/third_party/glfw/src/CMakeFiles/update_mappings.dir
-/home/kosar/Desktop/MakeItTalk/facewarp/facewarp/third_party/glfw/src/CMakeFiles/glfw.dir
