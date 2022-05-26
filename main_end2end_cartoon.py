@@ -197,7 +197,7 @@ for i in range(0,len(fls_names)):
     # ==============================================
     # Step 4 : Vector art morphing
     # ==============================================
-    warp_exe = os.path.join(os.getcwd(), 'facewarp', 'facewarp.exe')
+    warp_exe = os.path.join(os.getcwd(), 'facewarp', 'facewarp')
     import os
 
     if (os.path.exists(os.path.join(output_dir, 'output'))):
@@ -207,9 +207,7 @@ for i in range(0,len(fls_names)):
     cur_dir = os.getcwd()
     print(cur_dir)
 
-    if(os.name == 'nt'):
-        ''' windows '''
-        os.system('{} {} {} {} {} {}'.format(
+    os.system('{} {} {} {} {} {}'.format(
             warp_exe,
             os.path.join(cur_dir, '..', '..', opt_parser.jpg),
             os.path.join(cur_dir, '..', 'triangulation.txt'),
@@ -217,16 +215,7 @@ for i in range(0,len(fls_names)):
             os.path.join(cur_dir, '..', 'warped_points.txt'),
             os.path.join(cur_dir, '..', '..', opt_parser.jpg_bg),
             '-novsync -dump'))
-    else:
-        ''' linux '''
-        os.system('wine {} {} {} {} {} {}'.format(
-            warp_exe,
-            os.path.join(cur_dir, '..', '..', opt_parser.jpg),
-            os.path.join(cur_dir, '..', 'triangulation.txt'),
-            os.path.join(cur_dir, '..', 'reference_points.txt'),
-            os.path.join(cur_dir, '..', 'warped_points.txt'),
-            os.path.join(cur_dir, '..', '..', opt_parser.jpg_bg),
-            '-novsync -dump'))
+    print("SUCCESSSS")
     os.system('ffmpeg -y -r 62.5 -f image2 -i "%06d.tga" -i {} -pix_fmt yuv420p -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -shortest -strict -2 {}'.format(
         os.path.join(cur_dir, '..', '..', '..', 'examples', ain),
         os.path.join(cur_dir, '..', 'out.mp4')
