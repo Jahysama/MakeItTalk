@@ -1,11 +1,11 @@
 """
  # Copyright 2020 Adobe
  # All Rights Reserved.
- 
+
  # NOTICE: Adobe permits you to use, modify, and distribute this file in
  # accordance with the terms of the Adobe license agreement accompanying
  # it.
- 
+
 """
 
 import sys
@@ -197,16 +197,17 @@ for i in range(0,len(fls_names)):
     # Step 4 : Vector art morphing
     # ==============================================
     warp_exe = os.path.join(os.getcwd(), 'facewarp', 'facewarp.exe')
+    warp_linux = os.path.join(os.getcwd(), 'facewarp', 'facewarp')
     import os
-    
+
     if (os.path.exists(os.path.join(output_dir, 'output'))):
         shutil.rmtree(os.path.join(output_dir, 'output'))
     os.mkdir(os.path.join(output_dir, 'output'))
     os.chdir('{}'.format(os.path.join(output_dir, 'output')))
     cur_dir = os.getcwd()
     print(cur_dir)
-    
-    if(os.name == 'nt'): 
+
+    if(os.name == 'nt'):
         ''' windows '''
         os.system('{} {} {} {} {} {}'.format(
             warp_exe,
@@ -218,14 +219,13 @@ for i in range(0,len(fls_names)):
             '-novsync -dump'))
     else:
         ''' linux '''
-        os.system('wine {} {} {} {} {} {}'.format(
-            warp_exe,
+        os.system('{} {} {} {} {} {}'.format(
+            warp_linux,
             os.path.join(cur_dir, '..', '..', opt_parser.jpg),
             os.path.join(cur_dir, '..', 'triangulation.txt'),
             os.path.join(cur_dir, '..', 'reference_points.txt'),
             os.path.join(cur_dir, '..', 'warped_points.txt'),
-            os.path.join(cur_dir, '..', '..', opt_parser.jpg_bg),
-            '-novsync -dump'))
+            os.path.join(cur_dir, '..', '..', opt_parser.jpg_bg)))
     os.system('ffmpeg -y -r 62.5 -f image2 -i "%06d.tga" -i {} -pix_fmt yuv420p -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -shortest -strict -2 {}'.format(
         os.path.join(cur_dir, '..', '..', '..', 'examples', ain),
         os.path.join(cur_dir, '..', 'out.mp4')
