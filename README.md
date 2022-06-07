@@ -102,7 +102,7 @@ to amply lip motion (in x/y-axis direction) and head motion displacements, defau
 
 | Puppet Name |  wilk | smiling_person | sketch | color | cartoonM | danbooru1 | 
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| Image  | ![img](examples_cartoon/wilk_fullbody.jpg)  | ![img](examples_cartoon/smiling_person_full.png)  | ![img](examples_cartoon/sketch.png)  | ![img](examples_cartoon/color.jpg)  | ![img](examples_cartoon/cartoonM.png)  | ![img](examples_cartoon/danbooru1.jpg)  |
+| Image  | ![img](cartoons/wilk_fullbody.jpg)  | ![img](cartoons/smiling_person_full.png)  | ![img](cartoons/sketch.png)  | ![img](cartoons/color.jpg)  | ![img](cartoons/cartoonM.png)  | ![img](cartoons/danbooru1.jpg)  |
 
 ```
 python main_end2end_cartoon.py --jpg <cartoon_puppet_name_with_extension> --jpg_bg <puppet_background_with_extension>
@@ -182,4 +182,3 @@ This research is partially funded by NSF (EAGER-1942069)
 and a gift from Adobe. Our experiments were performed in the
 UMass GPU cluster obtained under the Collaborative Fund managed
 by the MassTech Collaborative.
-

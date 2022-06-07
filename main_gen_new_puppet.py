@@ -4,7 +4,7 @@ from facewarp.gen_puppet_utils import *
 ''' ================================================
             FOA face landmark detection 
 ================================================ '''
-data_dir = out_dir = 'examples_cartoon'
+data_dir = out_dir = 'cartoons'
 test_data = sys.argv[1] # for example 'roy_example.png'
 CH = test_data[:-4]
 use_gt_bb = False

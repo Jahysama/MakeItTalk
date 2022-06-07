@@ -22,8 +22,6 @@ ADD_NAIVE_EYE = False
 GEN_AUDIO = True
 GEN_FLS = True
 
-DEMO_CH = 'wilk.png'
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--jpg', type=str, required=True, help='Puppet image name to animate (with filename extension), e.g. wilk.png')
 parser.add_argument('--jpg_bg', type=str, required=True, help='Puppet image background (with filename extension), e.g. wilk_bg.jpg')
@@ -44,7 +42,7 @@ parser.add_argument('--reuse_train_emb_list', type=str, nargs='+', default=[]) #
 
 parser.add_argument('--add_audio_in', default=False, action='store_true')
 parser.add_argument('--comb_fan_awing', default=False, action='store_true')
-parser.add_argument('--output_folder', type=str, default='examples_cartoon')
+parser.add_argument('--output_folder', type=str, default='cartoons')
 
 #### NEW POSE MODEL
 parser.add_argument('--test_end2end', default=True, action='store_true')
@@ -63,37 +61,39 @@ parser.add_argument('--segment_batch_size', type=int, default=512, help='batch s
 parser.add_argument('--emb_coef', default=3.0, type=float)
 parser.add_argument('--lambda_laplacian_smooth_loss', default=1.0, type=float)
 parser.add_argument('--use_11spk_only', default=False, action='store_true')
+parser.add_argument('--user', default=False)
 
 
 opt_parser = parser.parse_args()
 
 DEMO_CH = opt_parser.jpg.split('.')[0]
 
-shape_3d = np.loadtxt('examples_cartoon/{}_face_close_mouth.txt'.format(DEMO_CH))
+shape_3d = np.loadtxt('cartoons/{}_face_close_mouth.txt'.format(DEMO_CH))
 
 ''' STEP 3: Generate audio data as input to audio branch '''
 au_data = []
 au_emb = []
-ains = glob.glob1('examples', '*.wav')
-ains = [item for item in ains if item is not 'tmp.wav']
+
+if not os.path.exists('audio'):
+    os.makedirs('audio')
+ains = glob.glob1('audio', '*.wav')
 ains.sort()
 for ain in ains:
-    os.system('ffmpeg -y -loglevel error -i examples/{} -ar 16000 examples/tmp.wav'.format(ain))
-    #shutil.copyfile('examples/tmp.wav', 'examples/{}'.format(ain))
+    os.system('ffmpeg -y -loglevel error -i audio/{} -ar 16000 audio/tmp.wav'.format(ain))
 
     # au embedding
     from thirdparty.resemblyer_util.speaker_emb import get_spk_emb
-    me, ae = get_spk_emb('examples/{}'.format(ain))
+    me, ae = get_spk_emb('audio/{}'.format(ain))
     au_emb.append(me.reshape(-1))
 
     print('Processing audio file', ain)
-    c = AutoVC_mel_Convertor('examples')
-    au_data_i = c.convert_single_wav_to_autovc_input(audio_filename=os.path.join('examples', ain),
-           autovc_model_path=opt_parser.load_AUTOVC_name)
+    c = AutoVC_mel_Convertor('audio')
+    au_data_i = c.convert_single_wav_to_autovc_input(audio_filename=os.path.join('audio', ain),
+                                                     autovc_model_path=opt_parser.load_AUTOVC_name)
     au_data += au_data_i
-    # os.remove(os.path.join('examples', 'tmp.wav'))
-if(os.path.isfile('examples/tmp.wav')):
-    os.remove('examples/tmp.wav')
+
+if os.path.isfile('audio/tmp.wav'):
+    os.remove('audio/tmp.wav')
 
 fl_data = []
 rot_tran, rot_quat, anchor_t_shape = [], [], []
@@ -105,20 +105,21 @@ for au, info in au_data:
     rot_quat.append(np.zeros(shape=(au_length, 4)))
     anchor_t_shape.append(np.zeros(shape=(au_length, 68 * 3)))
 
-if(os.path.exists(os.path.join('examples', 'dump', 'random_val_fl.pickle'))):
-    os.remove(os.path.join('examples', 'dump', 'random_val_fl.pickle'))
-if(os.path.exists(os.path.join('examples', 'dump', 'random_val_fl_interp.pickle'))):
-    os.remove(os.path.join('examples', 'dump', 'random_val_fl_interp.pickle'))
-if(os.path.exists(os.path.join('examples', 'dump', 'random_val_au.pickle'))):
-    os.remove(os.path.join('examples', 'dump', 'random_val_au.pickle'))
-if (os.path.exists(os.path.join('examples', 'dump', 'random_val_gaze.pickle'))):
-    os.remove(os.path.join('examples', 'dump', 'random_val_gaze.pickle'))
+weights_path = os.path.join('puppet_weights', 'dump')
+if(os.path.exists(os.path.join(weights_path, 'random_val_fl.pickle'))):
+    os.remove(os.path.join(weights_path, 'random_val_fl.pickle'))
+if(os.path.exists(os.path.join(weights_path, 'random_val_fl_interp.pickle'))):
+    os.remove(os.path.join(weights_path, 'random_val_fl_interp.pickle'))
+if(os.path.exists(os.path.join(weights_path, 'random_val_au.pickle'))):
+    os.remove(os.path.join(weights_path, 'random_val_au.pickle'))
+if (os.path.exists(os.path.join(weights_path, 'random_val_gaze.pickle'))):
+    os.remove(os.path.join(weights_path, 'random_val_gaze.pickle'))
 
-with open(os.path.join('examples', 'dump', 'random_val_fl.pickle'), 'wb') as fp:
+with open(os.path.join(weights_path, 'random_val_fl.pickle'), 'wb') as fp:
     pickle.dump(fl_data, fp)
-with open(os.path.join('examples', 'dump', 'random_val_au.pickle'), 'wb') as fp:
+with open(os.path.join(weights_path, 'random_val_au.pickle'), 'wb') as fp:
     pickle.dump(au_data, fp)
-with open(os.path.join('examples', 'dump', 'random_val_gaze.pickle'), 'wb') as fp:
+with open(os.path.join(weights_path, 'random_val_gaze.pickle'), 'wb') as fp:
     gaze = {'rot_trans':rot_tran, 'rot_quat':rot_quat, 'anchor_t_shape':anchor_t_shape}
     pickle.dump(gaze, fp)
 
@@ -133,15 +134,15 @@ else:
 print('finish gen fls')
 
 ''' STEP 5: de-normalize the output to the original image scale '''
-fls_names = glob.glob1('examples_cartoon', 'pred_fls_*.txt')
+fls_names = glob.glob1('cartoons', 'pred_fls_*.txt')
 fls_names.sort()
 
 for i in range(0,len(fls_names)):
-    ains = glob.glob1('examples', '*.wav')
+    ains = glob.glob1('audio', '*.wav')
     ains.sort()
     ain = ains[i]
-    fl = np.loadtxt(os.path.join('examples_cartoon', fls_names[i])).reshape((-1, 68,3))
-    output_dir = os.path.join('examples_cartoon', fls_names[i][:-4])
+    fl = np.loadtxt(os.path.join('cartoons', fls_names[i])).reshape((-1, 68,3))
+    output_dir = os.path.join('cartoons', fls_names[i][:-4])
     try:
         os.makedirs(output_dir)
     except:
@@ -149,7 +150,7 @@ for i in range(0,len(fls_names)):
 
     from util.utils import get_puppet_info
 
-    bound, scale, shift = get_puppet_info(DEMO_CH, ROOT_DIR='examples_cartoon')
+    bound, scale, shift = get_puppet_info(DEMO_CH, ROOT_DIR='cartoons')
 
     fls = fl.reshape((-1, 68, 3))
 
@@ -183,28 +184,27 @@ for i in range(0,len(fls_names)):
     np.savetxt(os.path.join(output_dir, 'warped_points.txt'), fls, fmt='%.2f')
 
     # static_points.txt
-    static_frame = np.loadtxt(os.path.join('examples_cartoon', '{}_face_open_mouth.txt'.format(DEMO_CH)))
+    static_frame = np.loadtxt(os.path.join('cartoons', '{}_face_open_mouth.txt'.format(DEMO_CH)))
     static_frame = static_frame[r, 0:2]
     static_frame = np.concatenate((static_frame, bound.reshape(-1, 2)), axis=0)
     np.savetxt(os.path.join(output_dir, 'reference_points.txt'), static_frame, fmt='%.2f')
 
     # triangle_vtx_index.txt
-    shutil.copy(os.path.join('examples_cartoon', DEMO_CH + '_delauney_tri.txt'),
+    shutil.copy(os.path.join('cartoons', DEMO_CH + '_delauney_tri.txt'),
                 os.path.join(output_dir, 'triangulation.txt'))
 
-    os.remove(os.path.join('examples_cartoon', fls_names[i]))
+    os.remove(os.path.join('cartoons', fls_names[i]))
 
     # ==============================================
     # Step 4 : Vector art morphing
     # ==============================================
     warp_exe = os.path.join(os.getcwd(), 'facewarp', 'facewarp')
-    import os
 
     if (os.path.exists(os.path.join(output_dir, 'output'))):
         shutil.rmtree(os.path.join(output_dir, 'output'))
     os.mkdir(os.path.join(output_dir, 'output'))
     os.chdir('{}'.format(os.path.join(output_dir, 'output')))
-    cur_dir = os.getcwd()
+    cur_dir = opt_parser.user
     print(f'Current dir: {cur_dir}')
 
     os.system('{} {} {} {} {} {}'.format(
@@ -217,6 +217,6 @@ for i in range(0,len(fls_names)):
             '-novsync -dump'))
     print("SUCCESSSS")
     os.system('ffmpeg -y -r 62.5 -f image2 -i "%06d.tga" -i {} -pix_fmt yuv420p -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -shortest -strict -2 {}'.format(
-        os.path.join(cur_dir, '..', '..', '..', 'examples', ain),
+        os.path.join(cur_dir, '..', '..', '..', 'audio', ain),
         os.path.join(cur_dir, '..', 'out.mp4')
     ))
