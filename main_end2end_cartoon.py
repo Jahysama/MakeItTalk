@@ -78,8 +78,9 @@ if not os.path.exists(os.path.join(opt_parser.user, 'audio')):
     os.makedirs(os.path.join(opt_parser.user, 'audio'))
 ains = glob.glob1(os.path.join(opt_parser.user, 'audio'), '*.wav')
 ains.sort()
+print(f'Ains len: {len(ains)}')
 for ain in ains:
-    os.system('ffmpeg -y -loglevel error -i audio/{} -ar 16000 audio/tmp.wav'.format(ain))
+    os.system(f'ffmpeg -y -loglevel error -i {os.path.join(opt_parser.user, "audio", ain)} -ar 16000 {os.path.join(opt_parser.user, "audio", "tmp.wav")}')
 
     # au embedding
     from thirdparty.resemblyer_util.speaker_emb import get_spk_emb
@@ -138,7 +139,7 @@ fls_names = glob.glob1(opt_parser.output_folder, 'pred_fls_*.txt')
 fls_names.sort()
 print(f'fls names {len(fls_names)}')
 
-for i in range(0,len(fls_names)):
+for i in range(0, len(fls_names) - 1):
     print(f"iteration {i}")
     ains = glob.glob1(os.path.join(opt_parser.user, 'audio'), '*.wav')
     ains.sort()
@@ -207,18 +208,18 @@ for i in range(0,len(fls_names)):
     os.mkdir(os.path.join(output_dir, 'output'))
     os.chdir('{}'.format(os.path.join(output_dir, 'output')))
     cur_dir = opt_parser.user
-    print(f'Current dir: {cur_dir}')
+    print(f'Current dir: {os.getcwd()}')
 
     os.system('{} {} {} {} {} {}'.format(
             warp_exe,
-            os.path.join('cartoons', opt_parser.jpg),
-            os.path.join(cur_dir, '..', 'triangulation.txt'),
-            os.path.join(cur_dir, '..', 'reference_points.txt'),
-            os.path.join(cur_dir, '..', 'warped_points.txt'),
-            os.path.join('cartoons', opt_parser.jpg_bg),
+            os.path.join('..', '..', '..', 'cartoons', opt_parser.jpg),
+            os.path.join('..', 'triangulation.txt'),
+            os.path.join('..', 'reference_points.txt'),
+            os.path.join('..', 'warped_points.txt'),
+            os.path.join('..', '..', '..', 'cartoons', opt_parser.jpg_bg),
             '-novsync -dump'))
     print("SUCCESSSS")
     os.system('ffmpeg -y -r 62.5 -f image2 -i "%06d.tga" -i {} -pix_fmt yuv420p -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -shortest -strict -2 {}'.format(
-        os.path.join(cur_dir, '..', '..', '..', os.path.join(opt_parser.user, 'audio'), ain),
-        os.path.join(cur_dir, '..', 'out.mp4')
+        os.path.join('..', '..', 'audio', ain),
+        os.path.join('..', '..', 'out.mp4')
     ))

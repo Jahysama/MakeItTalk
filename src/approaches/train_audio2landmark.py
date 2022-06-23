@@ -249,7 +249,7 @@ class Audio2landmark_model():
                 if(vis_fls):
                     from util.vis import Vis
                     Vis(fls=fake_fls_np, filename=video_name.split('\\')[-1].split('/')[-1], fps=62.5,
-                        audio_filenam=os.path.join(self.out_dir, video_name.split('\\')[-1].split('/')[-1]+'.wav'), out_dir=self.out_dir)
+                        audio_filenam=os.path.join(self.out_dir, 'audio', video_name.split('\\')[-1].split('/')[-1]+'.wav'), out_dir=self.out_dir)
 
 
     def __close_face_lip__(self, fl):
