@@ -1,11 +1,11 @@
 """
  # Copyright 2020 Adobe
  # All Rights Reserved.
- 
+
  # NOTICE: Adobe permits you to use, modify, and distribute this file in
  # accordance with the terms of the Adobe license agreement accompanying
  # it.
- 
+
 """
 
 import numpy as np
@@ -18,7 +18,7 @@ OTHER_SPECIFIC_VOICE = None
 
 class Vis():
 
-    def __init__(self, fls, filename, audio_filenam=None, fps=100, frames=1000):
+    def __init__(self, fls, filename, audio_filenam=None, fps=100, frames=1000, out_dir='output'):
 
         # from scipy.signal import savgol_filter
         # fls = savgol_filter(fls, 21, 3, axis=0)
@@ -36,7 +36,7 @@ class Vis():
         fls = fls.reshape((-1, 68, 3))
         fls = fls.astype(int)
 
-        writer = cv2.VideoWriter(os.path.join('examples', 'tmp.mp4'),
+        writer = cv2.VideoWriter(os.path.join(out_dir, 'tmp.mp4'),
                                  cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), fps, (400, 400))
 
         frames = np.min((fls.shape[0], frames))
@@ -50,17 +50,17 @@ class Vis():
         if(audio_filenam is not None):
             print(audio_filenam)
             os.system('ffmpeg -y -i {} -i {} -strict -2 -shortest {}'.format(
-                os.path.join('examples', 'tmp.mp4'),
+                os.path.join(out_dir, 'tmp.mp4'),
                 audio_filenam,
-                os.path.join('examples', '{}_av.mp4'.format(filename))
+                os.path.join(out_dir, '{}_av.mp4'.format(filename))
             ))
         else:
             os.system('ffmpeg -y -i {} {}'.format(
-                os.path.join('examples', 'tmp.mp4'),
-                os.path.join('examples', '{}_av.mp4'.format(filename))
+                os.path.join(out_dir, 'tmp.mp4'),
+                os.path.join(out_dir, '{}_av.mp4'.format(filename))
             ))
 
-        os.remove(os.path.join('examples', 'tmp.mp4'))
+        os.remove(os.path.join(out_dir, 'tmp.mp4'))
 
 
 

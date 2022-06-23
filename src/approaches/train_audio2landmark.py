@@ -36,7 +36,7 @@ class Audio2landmark_model():
         self.std_face_id = self.std_face_id.reshape(1, 204)
         self.std_face_id = torch.tensor(self.std_face_id, requires_grad=False, dtype=torch.float).to(device)
 
-        self.eval_data = Audio2landmark_Dataset(dump_dir='examples/dump',
+        self.eval_data = Audio2landmark_Dataset(dump_dir='puppet_weights/dump',
                                                 dump_name='random',
                                                 status='val',
                                                num_window_frames=18,
@@ -78,7 +78,9 @@ class Audio2landmark_model():
         self.anchor_t_shape = np.loadtxt('src/dataset/utils/STD_FACE_LANDMARKS.txt')
         self.anchor_t_shape = self.anchor_t_shape[self.t_shape_idx, :]
 
-        with open(os.path.join('examples', 'dump', 'emb.pickle'), 'rb') as fp:
+        self.out_dir = opt_parser.user
+
+        with open(os.path.join('puppet_weights', 'dump', 'emb.pickle'), 'rb') as fp:
             self.test_embs = pickle.load(fp)
 
         print('====================================')
@@ -247,7 +249,7 @@ class Audio2landmark_model():
                 if(vis_fls):
                     from util.vis import Vis
                     Vis(fls=fake_fls_np, filename=video_name.split('\\')[-1].split('/')[-1], fps=62.5,
-                        audio_filenam=os.path.join('examples', video_name.split('\\')[-1].split('/')[-1]+'.wav'))
+                        audio_filenam=os.path.join(self.out_dir, video_name.split('\\')[-1].split('/')[-1]+'.wav'), out_dir=self.out_dir)
 
 
     def __close_face_lip__(self, fl):

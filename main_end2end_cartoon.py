@@ -29,10 +29,10 @@ parser.add_argument('--inner_lip', default=False, action='store_true', help='add
 
 parser.add_argument('--out', type=str, default='out.mp4')
 
-parser.add_argument('--load_AUTOVC_name', type=str, default='examples/ckpt/ckpt_autovc.pth')
-parser.add_argument('--load_a2l_G_name', type=str, default='examples/ckpt/ckpt_speaker_branch.pth') #ckpt_audio2landmark_g.pth') #
-parser.add_argument('--load_a2l_C_name', type=str, default='examples/ckpt/ckpt_content_branch.pth') #ckpt_audio2landmark_c.pth')
-parser.add_argument('--load_G_name', type=str, default='examples/ckpt/ckpt_116_i2i_comb.pth') #ckpt_i2i_finetune_150.pth') #ckpt_image2image.pth') #
+parser.add_argument('--load_AUTOVC_name', type=str, default='puppet_weights/ckpt/ckpt_autovc.pth')
+parser.add_argument('--load_a2l_G_name', type=str, default='puppet_weights/ckpt/ckpt_speaker_branch.pth') #ckpt_audio2landmark_g.pth') #
+parser.add_argument('--load_a2l_C_name', type=str, default='puppet_weights/ckpt/ckpt_content_branch.pth') #ckpt_audio2landmark_c.pth')
+parser.add_argument('--load_G_name', type=str, default='puppet_weights/ckpt/ckpt_116_i2i_comb.pth') #ckpt_i2i_finetune_150.pth') #ckpt_image2image.pth') #
 
 parser.add_argument('--amp_lip_x', type=float, default=2.0)
 parser.add_argument('--amp_lip_y', type=float, default=2.0)
@@ -74,26 +74,26 @@ shape_3d = np.loadtxt('cartoons/{}_face_close_mouth.txt'.format(DEMO_CH))
 au_data = []
 au_emb = []
 
-if not os.path.exists('audio'):
-    os.makedirs('audio')
-ains = glob.glob1('audio', '*.wav')
+if not os.path.exists(os.path.join(opt_parser.user, 'audio')):
+    os.makedirs(os.path.join(opt_parser.user, 'audio'))
+ains = glob.glob1(os.path.join(opt_parser.user, 'audio'), '*.wav')
 ains.sort()
 for ain in ains:
     os.system('ffmpeg -y -loglevel error -i audio/{} -ar 16000 audio/tmp.wav'.format(ain))
 
     # au embedding
     from thirdparty.resemblyer_util.speaker_emb import get_spk_emb
-    me, ae = get_spk_emb('audio/{}'.format(ain))
+    me, ae = get_spk_emb(os.path.join(opt_parser.user, 'audio', '{}'.format(ain)))
     au_emb.append(me.reshape(-1))
 
     print('Processing audio file', ain)
     c = AutoVC_mel_Convertor('audio')
-    au_data_i = c.convert_single_wav_to_autovc_input(audio_filename=os.path.join('audio', ain),
+    au_data_i = c.convert_single_wav_to_autovc_input(audio_filename=os.path.join(os.path.join(opt_parser.user, 'audio'), ain),
                                                      autovc_model_path=opt_parser.load_AUTOVC_name)
     au_data += au_data_i
 
-if os.path.isfile('audio/tmp.wav'):
-    os.remove('audio/tmp.wav')
+if os.path.isfile(os.path.join(opt_parser.user, 'audio', 'tmp.wav')):
+    os.remove(os.path.join(opt_parser.user, 'audio', 'tmp.wav'))
 
 fl_data = []
 rot_tran, rot_quat, anchor_t_shape = [], [], []
@@ -134,15 +134,17 @@ else:
 print('finish gen fls')
 
 ''' STEP 5: de-normalize the output to the original image scale '''
-fls_names = glob.glob1('cartoons', 'pred_fls_*.txt')
+fls_names = glob.glob1(opt_parser.output_folder, 'pred_fls_*.txt')
 fls_names.sort()
+print(f'fls names {len(fls_names)}')
 
 for i in range(0,len(fls_names)):
-    ains = glob.glob1('audio', '*.wav')
+    print(f"iteration {i}")
+    ains = glob.glob1(os.path.join(opt_parser.user, 'audio'), '*.wav')
     ains.sort()
     ain = ains[i]
-    fl = np.loadtxt(os.path.join('cartoons', fls_names[i])).reshape((-1, 68,3))
-    output_dir = os.path.join('cartoons', fls_names[i][:-4])
+    fl = np.loadtxt(os.path.join(opt_parser.output_folder, fls_names[i])).reshape((-1, 68,3))
+    output_dir = os.path.join(opt_parser.output_folder, fls_names[i][:-4])
     try:
         os.makedirs(output_dir)
     except:
@@ -193,7 +195,7 @@ for i in range(0,len(fls_names)):
     shutil.copy(os.path.join('cartoons', DEMO_CH + '_delauney_tri.txt'),
                 os.path.join(output_dir, 'triangulation.txt'))
 
-    os.remove(os.path.join('cartoons', fls_names[i]))
+    os.remove(os.path.join(opt_parser.output_folder, fls_names[i]))
 
     # ==============================================
     # Step 4 : Vector art morphing
@@ -209,14 +211,14 @@ for i in range(0,len(fls_names)):
 
     os.system('{} {} {} {} {} {}'.format(
             warp_exe,
-            os.path.join(cur_dir, '..', '..', opt_parser.jpg),
+            os.path.join('cartoons', opt_parser.jpg),
             os.path.join(cur_dir, '..', 'triangulation.txt'),
             os.path.join(cur_dir, '..', 'reference_points.txt'),
             os.path.join(cur_dir, '..', 'warped_points.txt'),
-            os.path.join(cur_dir, '..', '..', opt_parser.jpg_bg),
+            os.path.join('cartoons', opt_parser.jpg_bg),
             '-novsync -dump'))
     print("SUCCESSSS")
     os.system('ffmpeg -y -r 62.5 -f image2 -i "%06d.tga" -i {} -pix_fmt yuv420p -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -shortest -strict -2 {}'.format(
-        os.path.join(cur_dir, '..', '..', '..', 'audio', ain),
+        os.path.join(cur_dir, '..', '..', '..', os.path.join(opt_parser.user, 'audio'), ain),
         os.path.join(cur_dir, '..', 'out.mp4')
     ))
