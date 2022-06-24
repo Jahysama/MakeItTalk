@@ -139,7 +139,7 @@ fls_names = glob.glob1(opt_parser.output_folder, 'pred_fls_*.txt')
 fls_names.sort()
 print(f'fls names {len(fls_names)}')
 
-for i in range(0, len(fls_names) - 1):
+for i in range(0, len(fls_names)):
     print(f"iteration {i}")
     ains = glob.glob1(os.path.join(opt_parser.user, 'audio'), '*.wav')
     ains.sort()
